@@ -17,7 +17,7 @@ variable "key_pair_name" {
 }
 
 variable "public_key_path" {
-  description = "SSH 公鑰路徑"
+  description = "SSH public key path"
   type        = string
   default     = "~/.ssh/terraform-ec2.pub"
 }
