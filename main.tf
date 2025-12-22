@@ -31,6 +31,45 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
+# 獲取所有可用的 AZ
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+# VPC：建立自定義 VPC
+resource "aws_vpc" "main_vpc" {
+  cidr_block           = "10.0.0.0/18"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = {
+    Name = "main-vpc"
+  }
+}
+
+# Public Subnet：位於第一個 AZ
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = "10.0.0.0/20"
+  availability_zone       = data.aws_availability_zones.available.names[0]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet"
+  }
+}
+
+# Private Subnet：位於第二個 AZ
+resource "aws_subnet" "private_subnet" {
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = "10.0.16.0/20"
+  availability_zone = data.aws_availability_zones.available.names[1]
+
+  tags = {
+    Name = "private-subnet"
+  }
+}
+
 # Key Pair：上傳本地公鑰到 AWS
 resource "aws_key_pair" "my_key" {
   key_name   = var.key_pair_name
@@ -41,6 +80,7 @@ resource "aws_key_pair" "my_key" {
 resource "aws_security_group" "main" {
   name        = var.security_group_name
   description = var.security_group_description
+  vpc_id      = aws_vpc.main_vpc.id
 
   ingress {
     from_port   = var.ssh_port
@@ -59,11 +99,11 @@ resource "aws_security_group" "main" {
 
 # EC2 實例配置
 resource "aws_instance" "main" {
-  ami                         = data.aws_ami.amazon_linux_2.id
-  instance_type               = "t3.micro"
-  key_name                    = aws_key_pair.my_key.key_name
-  associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.main.id]
+  ami                    = data.aws_ami.amazon_linux_2.id
+  instance_type          = "t3.micro"
+  key_name               = aws_key_pair.my_key.key_name
+  subnet_id              = aws_subnet.public_subnet.id
+  vpc_security_group_ids = [aws_security_group.main.id]
 
   tags = {
     Name = "my-instance"
