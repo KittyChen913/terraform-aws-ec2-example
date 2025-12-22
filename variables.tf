@@ -34,18 +34,6 @@ variable "security_group_description" {
   default     = "Security group for EC2"
 }
 
-variable "instance_type" {
-  description = "EC2 Instance 類型"
-  type        = string
-  default     = "t3.micro"
-}
-
-variable "instance_name" {
-  description = "EC2 Instance 名稱"
-  type        = string
-  default     = "my-instance"
-}
-
 variable "ssh_port" {
   description = "SSH 連接埠"
   type        = number
