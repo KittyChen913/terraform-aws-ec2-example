@@ -38,7 +38,7 @@ data "aws_availability_zones" "available" {
 
 # VPC：建立自定義 VPC
 resource "aws_vpc" "main_vpc" {
-  cidr_block           = "10.0.0.0/18"
+  cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
   enable_dns_support   = true
 
@@ -50,7 +50,7 @@ resource "aws_vpc" "main_vpc" {
 # Public Subnet：位於第一個 AZ
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.main_vpc.id
-  cidr_block              = "10.0.0.0/20"
+  cidr_block              = var.public_subnet_cidr
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = true
 
@@ -62,7 +62,7 @@ resource "aws_subnet" "public_subnet" {
 # Private Subnet：位於第二個 AZ
 resource "aws_subnet" "private_subnet" {
   vpc_id            = aws_vpc.main_vpc.id
-  cidr_block        = "10.0.16.0/20"
+  cidr_block        = var.private_subnet_cidr
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
@@ -172,7 +172,7 @@ resource "aws_security_group" "main" {
 # EC2 實例配置
 resource "aws_instance" "public" {
   ami                    = data.aws_ami.amazon_linux_2.id
-  instance_type          = "t3.micro"
+  instance_type          = var.instance_type
   key_name               = aws_key_pair.my_key.key_name
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.main.id]
@@ -185,7 +185,7 @@ resource "aws_instance" "public" {
 # Private EC2 實例配置
 resource "aws_instance" "private" {
   ami                    = data.aws_ami.amazon_linux_2.id
-  instance_type          = "t3.micro"
+  instance_type          = var.instance_type
   key_name               = aws_key_pair.my_key.key_name
   subnet_id              = aws_subnet.private_subnet.id
   vpc_security_group_ids = [aws_security_group.main.id]

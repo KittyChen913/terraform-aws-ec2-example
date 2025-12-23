@@ -45,3 +45,26 @@ variable "allowed_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+variable "vpc_cidr_block" {
+  description = "VPC CIDR 區塊"
+  type        = string
+  default     = "10.0.0.0/18"
+}
+
+variable "public_subnet_cidr" {
+  description = "Public Subnet CIDR 區塊"
+  type        = string
+  default     = "10.0.0.0/20"
+}
+
+variable "private_subnet_cidr" {
+  description = "Private Subnet CIDR 區塊"
+  type        = string
+  default     = "10.0.16.0/20"
+}
+
+variable "instance_type" {
+  description = "EC2 Instance Type"
+  type        = string
+  default     = "t3.micro"
+}
