@@ -79,6 +79,29 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
+# Elastic IP：為 NAT Gateway 使用
+resource "aws_eip" "nat" {
+  domain = "vpc"
+
+  depends_on = [aws_internet_gateway.main]
+
+  tags = {
+    Name = "nat-eip"
+  }
+}
+
+# NAT Gateway：位於 public subnet，提供 private subnet 的 instance 訪問 Internet
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_subnet.id
+
+  depends_on = [aws_internet_gateway.main]
+
+  tags = {
+    Name = "main-nat"
+  }
+}
+
 # Public Route Table：用於 public subnet
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main_vpc.id
@@ -102,6 +125,11 @@ resource "aws_route_table_association" "public" {
 # Private Route Table：用於 private subnet
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main_vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.main.id
+  }
 
   tags = {
     Name = "private-rt"
