@@ -182,5 +182,5 @@ output "instance_private_ip" {
 # Output：輸出 SSH 登入命令
 output "ssh_command" {
   value       = "ssh -i ~/.ssh/terraform-ec2 ec2-user@${aws_instance.public.public_ip}"
-  description = "SSH 登入命令"
+  description = "連接到 public instance 的 SSH 命令"
 }
