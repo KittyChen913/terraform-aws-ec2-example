@@ -16,16 +16,6 @@
   - 出站網際網路流量通過 NAT Gateway 進行 (對外隱藏真實 IP)
   - 無法從外部直接連接
 
-## 工作流程
-
-1. **定義變數** (`variables.tf`) - 設定 AWS 區域、VPC CIDR、Instance 類型等參數
-2. **配置資源**
-   - `network.tf` - 建立 VPC、Public/Private Subnet、Internet Gateway、NAT Gateway、Route Table
-   - `security.tf` - 上傳 SSH public key (Key Pair)、建立 Security Group
-   - `compute.tf` - 建立 Public 和 Private EC2 Instance
-   - `main.tf` - Terraform 配置和 Data Sources (查詢最新的 Amazon Linux 2 AMI)
-3. **輸出結果** (`outputs.tf`) - 顯示 Public IP、Private IP 和 SSH 登入命令
-
 ## 快速開始
 
 ### 前置條件
@@ -107,7 +97,7 @@ cat ~/.ssh/terraform-ec2.pub
 ├── .gitignore                 # Git 忽略文件配置
 ├── .terraform.lock.hcl        # Terraform 鎖定 provider 版本的檔案
 ├── docs/                      # 專案文件目錄 (包含架構圖)
-├── main.tf                    # Terraform 配置和 Data Sources
+├── providers.tf               # Terraform 配置和 Data Sources
 ├── network.tf                 # VPC、Subnet、Internet Gateway、NAT Gateway、Route Table
 ├── security.tf                # Key Pair、Security Group
 ├── compute.tf                 # EC2 Instance
@@ -118,7 +108,7 @@ cat ~/.ssh/terraform-ec2.pub
 └── terraform.tfstate*         # Terraform 狀態文件 (不會提交到 Git)
 ```
 
-## 關鍵資源
+## 資源說明
 
 ### 網路層
 - **VPC** - 自定義虛擬私有雲
